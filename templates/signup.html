@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="form-container animate-fade-in">
+    <div class="text-center" style="margin-bottom: 2rem;">
+        <div style="width: 60px; height: 60px; background: rgba(16, 185, 129, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--accent-green); font-size: 1.5rem;">
+            <i class="fa-solid fa-user-plus"></i>
+        </div>
+        <h2>Create Account</h2>
+        <p style="margin-bottom: 0;">Start trading in minutes</p>
+    </div>
+    
+    <form method="POST" action="{{ url_for('signup') }}">
+        <div class="form-group">
+            <label for="username"><i class="fa-regular fa-user"></i> Username</label>
+            <input type="text" id="username" name="username" required autofocus placeholder="johndoe">
+        </div>
+
+        <div class="form-group">
+            <label for="email"><i class="fa-regular fa-envelope"></i> Email Address</label>
+            <input type="email" id="email" name="email" required placeholder="john@example.com">
+        </div>
+        
+        <div class="form-group">
+            <label for="password"><i class="fa-solid fa-key"></i> Password</label>
+            <input type="password" id="password" name="password" required placeholder="••••••••">
+        </div>
+        
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem; padding: 0.875rem;">
+            <i class="fa-solid fa-rocket"></i> Sign Up
+        </button>
+    </form>
+    
+    <p class="text-center" style="margin-top: 2rem; font-size: 0.875rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+        Already have an account? <a href="{{ url_for('login') }}" class="text-gradient" style="text-decoration: none; font-weight: 600;">Sign In</a>
+    </p>
+</div>
+{% endblock %}

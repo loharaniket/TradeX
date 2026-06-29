@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard-header animate-fade-in">
+    <div>
+        <h2 style="display: flex; align-items: center; gap: 0.5rem;"><i class="fa-solid fa-shield-halved text-red"></i> Admin Dashboard</h2>
+        <p style="margin-bottom: 0;">System Overview & Market Management</p>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;" class="animate-fade-in delay-100">
+    <!-- Add Stock Form -->
+    <div class="form-container" style="margin: 0; max-width: 100%;">
+        <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fa-solid fa-square-plus text-blue"></i> Add New Stock
+        </h3>
+        <form method="POST" action="{{ url_for('admin_dashboard') }}">
+            <div class="form-group">
+                <label for="symbol">Ticker Symbol</label>
+                <input type="text" id="symbol" name="symbol" required placeholder="AAPL">
+            </div>
+            <div class="form-group">
+                <label for="name">Company Name</label>
+                <input type="text" id="name" name="name" required placeholder="Apple Inc.">
+            </div>
+            <div class="form-group">
+                <label for="price">Initial Price (₹)</label>
+                <input type="number" step="0.01" id="price" name="price" required placeholder="150.00">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label for="sector">Sector</label>
+                    <input type="text" id="sector" name="sector" placeholder="Technology">
+                </div>
+                <div class="form-group">
+                    <label for="market_cap">Market Cap</label>
+                    <input type="text" id="market_cap" name="market_cap" placeholder="2.5T">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                <i class="fa-solid fa-cloud-arrow-up"></i> Add to Market
+            </button>
+        </form>
+    </div>
+
+    <!-- System Data -->
+    <div class="animate-fade-in delay-200">
+        <!-- Users Table -->
+        <h3 style="display: flex; align-items: center; gap: 0.5rem;"><i class="fa-solid fa-users"></i> Registered Users</h3>
+        <div class="table-container mb-2">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td style="font-weight: 500;">
+                            <i class="fa-regular fa-user" style="color: var(--text-secondary); margin-right: 0.5rem;"></i>
+                            {{ user.username }}
+                        </td>
+                        <td style="color: var(--text-secondary);">{{ user.email }}</td>
+                        <td>
+                            <span class="pill" style="background: {% if user.role == 'admin' %}rgba(239, 68, 68, 0.15){% else %}rgba(16, 185, 129, 0.15){% endif %}; color: {% if user.role == 'admin' %}var(--accent-red){% else %}var(--accent-green){% endif %};">
+                                {% if user.role == 'admin' %}<i class="fa-solid fa-crown"></i>{% else %}<i class="fa-solid fa-user-tie"></i>{% endif %}
+                                {{ user.role | upper }}
+                            </span>
+                        </td>
+                        <td>
+                            <i class="fa-solid fa-circle" style="font-size: 0.5rem; color: {% if user.is_active %}var(--accent-green){% else %}var(--accent-red){% endif %}; margin-right: 0.25rem;"></i>
+                            {{ "Active" if user.is_active else "Inactive" }}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="4" class="text-center text-secondary">No users found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Stocks Table -->
+        <h3 style="display: flex; align-items: center; gap: 0.5rem;"><i class="fa-solid fa-layer-group"></i> Market Catalog</h3>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Sector</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stock in stocks %}
+                    <tr>
+                        <td style="font-weight: 700; color: var(--accent-blue);">{{ stock.symbol }}</td>
+                        <td>{{ stock.name }}</td>
+                        <td class="text-green" style="font-weight: 600;">₹{{ stock.price }}</td>
+                        <td>
+                            <span class="pill" style="background: rgba(148, 163, 184, 0.15); color: var(--text-secondary);">
+                                <i class="fa-solid fa-tag"></i> {{ stock.sector }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="4" class="text-center text-secondary">No stocks available.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

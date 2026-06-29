@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="form-container animate-fade-in" style="max-width: 500px;">
+    <h2 class="text-center mb-2" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+        <i class="fa-solid fa-money-bill-transfer {% if action == 'SELL' %}text-red{% else %}text-green{% endif %}"></i> 
+        Execute Trade
+    </h2>
+    
+    <div style="background: rgba(15, 23, 42, 0.6); padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 2rem; text-align: center; border: 1px solid var(--border-color); box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.2);">
+        <h3 style="font-size: 2.5rem; color: var(--text-primary); margin-bottom: 0.25rem; letter-spacing: -1px;">{{ stock.symbol }}</h3>
+        <div style="color: var(--text-secondary); margin-bottom: 1rem; font-weight: 500;">{{ stock.name }}</div>
+        <div class="text-green btn-pulse" style="font-size: 1.75rem; font-weight: 700; display: inline-block; border-radius: 0.5rem; padding: 0.5rem 1rem; background: rgba(16, 185, 129, 0.1);">
+            ₹{{ stock.price }}
+        </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('trade') }}">
+        <input type="hidden" name="stock_id" value="{{ stock.id }}">
+        
+        <div class="form-group">
+            <label for="action"><i class="fa-solid fa-arrows-rotate"></i> Action</label>
+            <select id="action" name="action" required>
+                <option value="BUY" {% if action == 'BUY' %}selected{% endif %}>BUY (Add to Portfolio)</option>
+                <option value="SELL" {% if action == 'SELL' %}selected{% endif %}>SELL (Liquidate Asset)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="quantity"><i class="fa-solid fa-layer-group"></i> Quantity (Shares)</label>
+            <input type="number" id="quantity" name="quantity" min="1" step="1" required placeholder="Enter amount..." style="font-size: 1.1rem;">
+        </div>
+        
+        <div style="background: rgba(15, 23, 42, 0.4); padding: 1rem 1.5rem; border-radius: 0.5rem; display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; border: 1px solid var(--border-color);">
+            <div style="color: var(--text-secondary); font-weight: 500;"><i class="fa-solid fa-calculator"></i> Estimated Total:</div>
+            <div id="estimated-total" class="text-gradient" style="font-size: 1.5rem; font-weight: 700;">₹0.00</div>
+        </div>
+
+        <button type="submit" class="btn {% if action == 'SELL' %}btn-sell{% else %}btn-buy{% endif %} btn-pulse" style="width: 100%; margin-top: 1.5rem; padding: 1.25rem; font-size: 1.1rem;">
+            <i class="fa-solid fa-check-double"></i> Confirm {{ action|default('BUY') }} Order
+        </button>
+    </form>
+</div>
+
+<script>
+    const price = {{ stock.price }};
+    const qtyInput = document.getElementById('quantity');
+    const totalDisplay = document.getElementById('estimated-total');
+
+    qtyInput.addEventListener('input', (e) => {
+        const qty = parseInt(e.target.value) || 0;
+        const total = (qty * price).toFixed(2);
+        totalDisplay.innerText = '₹' + total.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    });
+</script>
+{% endblock %}

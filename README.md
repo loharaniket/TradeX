@@ -48,7 +48,7 @@ Clone this repository and set up your virtual environment:
 
 ```bash
 # Clone the repo
-git clone https://github.com/aniketlohar/Stocker.git
+git clone https://github.com/loharaniket/Stocker.git
 cd Stocker
 
 # Create a virtual environment

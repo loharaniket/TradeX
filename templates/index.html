@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="text-center animate-fade-in" style="margin-top: 10vh;">
+    <div style="display: inline-block; padding: 0.5rem 1rem; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 9999px; color: var(--accent-blue); font-size: 0.875rem; font-weight: 600; margin-bottom: 2rem;">
+        <i class="fa-solid fa-rocket" style="margin-right: 0.5rem;"></i> The Future of Cloud Trading
+    </div>
+    
+    <h1 style="font-size: 4.5rem; letter-spacing: -2px; margin-bottom: 1.5rem; line-height: 1.1;">
+        Trade with <span class="text-gradient">Confidence</span>.
+    </h1>
+    
+    <p style="font-size: 1.25rem; max-width: 600px; margin: 0 auto 3rem; color: var(--text-secondary);">
+        Stocker is the premier cloud-native trading platform. Execute real-time transactions, track your portfolio, and stay ahead of the market with instant AWS SNS alerts.
+    </p>
+    
+    <div class="animate-fade-in delay-100">
+        <a href="{{ url_for('signup') }}" class="btn btn-primary btn-pulse" style="padding: 1rem 2.5rem; font-size: 1.1rem; border-radius: 9999px; margin-right: 1rem;">
+            Get Started Now <i class="fa-solid fa-arrow-right"></i>
+        </a>
+        <a href="{{ url_for('login') }}" class="btn btn-outline" style="padding: 1rem 2.5rem; font-size: 1.1rem; border-radius: 9999px;">
+            Sign In
+        </a>
+    </div>
+
+    <div style="margin-top: 6rem; display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap;" class="animate-fade-in delay-200">
+        <div class="stat-card" style="max-width: 300px; text-align: left; background: rgba(30, 41, 59, 0.4);">
+            <div style="font-size: 2rem; color: var(--accent-blue); margin-bottom: 1rem;">
+                <i class="fa-solid fa-bolt"></i>
+            </div>
+            <h3 style="font-size: 1.1rem; color: var(--text-primary);">Lightning Fast</h3>
+            <p style="font-size: 0.9rem; margin-bottom: 0;">Execute trades with minimal latency on our optimized AWS infrastructure.</p>
+        </div>
+        
+        <div class="stat-card" style="max-width: 300px; text-align: left; background: rgba(30, 41, 59, 0.4);">
+            <div style="font-size: 2rem; color: var(--accent-green); margin-bottom: 1rem;">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h3 style="font-size: 1.1rem; color: var(--text-primary);">Secure Core</h3>
+            <p style="font-size: 0.9rem; margin-bottom: 0;">Enterprise-grade security protecting your assets and personal data.</p>
+        </div>
+        
+        <div class="stat-card" style="max-width: 300px; text-align: left; background: rgba(30, 41, 59, 0.4);">
+            <div style="font-size: 2rem; color: var(--accent-red); margin-bottom: 1rem;">
+                <i class="fa-solid fa-bell"></i>
+            </div>
+            <h3 style="font-size: 1.1rem; color: var(--text-primary);">Instant Alerts</h3>
+            <p style="font-size: 0.9rem; margin-bottom: 0;">Never miss a move with real-time SNS notifications delivered straight to you.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stocker | Cloud-Native Trading</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <nav>
+        <a href="{{ url_for('index') }}" class="nav-brand">
+            <i class="fa-solid fa-arrow-trend-up"></i> Stocker
+        </a>
+        <div class="nav-links">
+            {% if session.get('user_id') %}
+                {% if session.get('role') == 'admin' %}
+                    <a href="{{ url_for('admin_dashboard') }}"><i class="fa-solid fa-shield-halved"></i> Admin Panel</a>
+                {% else %}
+                    <a href="{{ url_for('trader_dashboard') }}"><i class="fa-solid fa-chart-line"></i> Market</a>
+                    <a href="{{ url_for('portfolio') }}"><i class="fa-solid fa-briefcase"></i> Portfolio</a>
+                {% endif %}
+                <a href="{{ url_for('logout') }}" class="btn btn-outline">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                </a>
+            {% else %}
+                <a href="{{ url_for('login') }}"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+                <a href="{{ url_for('signup') }}" class="btn btn-primary">
+                    <i class="fa-solid fa-user-plus"></i> Sign Up
+                </a>
+            {% endif %}
+        </div>
+    </nav>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">
+                        {% if category == 'success' %}
+                            <i class="fa-solid fa-circle-check"></i>
+                        {% else %}
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        {% endif %}
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Quick script to auto-hide flash messages after 5 seconds -->
+    <script>
+        setTimeout(() => {
+            const flashes = document.querySelectorAll('.flash');
+            flashes.forEach(flash => {
+                flash.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                flash.style.opacity = '0';
+                flash.style.transform = 'translateX(100%)';
+                setTimeout(() => flash.remove(), 500);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>
