@@ -103,19 +103,15 @@ TradeX is a full-stack paper trading web application and stock market simulator.
 
 ---
 
-## 🔑 Default & Demo Credentials
+## 🔑 Accounts & Authentication
 
-For testing and demonstration, use the pre-configured accounts below:
-
-### Default Administrator Account
+### Administrator Account
 - **Portal URL**: `/admin/login`
-- **Email**: `admin@tradex.com`
-- **Password**: `Admin@12345`
-- **Role**: `admin`
+- Create an administrator by registering with role `"admin"` or setting `role: "admin"` directly on your user document in MongoDB Atlas.
 - **Features**: User management, all platform trades audit, virtual balance adjustment tool, and stock market trading suspension switches.
 
-### Regular Trader Account
-- You can register any new account on `/register` — it will immediately receive `$100,000.00` in virtual funds.
+### Trader Account
+- Anyone can register on `/register` — each new account automatically starts with `$100,000.00` in virtual buying power.
 
 ---
 
