@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import StockChart from './pages/StockChart';
 import './App.css';
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/stocks/:symbol" element={<StockChart />} />
             </Routes>
           </main>
         </div>

@@ -172,6 +172,7 @@ function Home() {
                   <th className="text-right">24h Change</th>
                   <th className="text-right">52-Week Range</th>
                   <th className="text-right">Market Cap</th>
+                  <th className="text-right">Chart</th>
                 </tr>
               </thead>
               <tbody>
@@ -181,7 +182,9 @@ function Home() {
                     return (
                       <tr key={stock.symbol} className="stock-row">
                         <td>
-                          <span className="stock-symbol-badge">{stock.symbol}</span>
+                          <Link to={`/stocks/${stock.symbol}`} className="stock-symbol-badge-link">
+                            <span className="stock-symbol-badge">{stock.symbol}</span>
+                          </Link>
                         </td>
                         <td>
                           <span className="stock-company-name">{stock.companyName}</span>
@@ -200,12 +203,17 @@ function Home() {
                         <td className="text-right stock-market-cap">
                           {formatMarketCap(stock.marketCap)}
                         </td>
+                        <td className="text-right">
+                          <Link to={`/stocks/${stock.symbol}`} className="btn btn-secondary btn-sm chart-btn">
+                            Chart 📈
+                          </Link>
+                        </td>
                       </tr>
                     );
                   })
                 ) : (
                   <tr>
-                    <td colSpan="6" className="no-stocks-found">
+                    <td colSpan="7" className="no-stocks-found">
                       No stocks found matching "<strong>{searchQuery}</strong>".
                     </td>
                   </tr>
