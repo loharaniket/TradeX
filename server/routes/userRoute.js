@@ -4,6 +4,8 @@ const {
   registerUser,
   loginUser,
   getUserProfile,
+  getWalletSummary,
+  resetVirtualWallet,
 } = require('../controllers/userController');
 const { protect } = require('../middleware/authMiddleware');
 
@@ -11,7 +13,9 @@ const { protect } = require('../middleware/authMiddleware');
 router.post('/register', registerUser);
 router.post('/login', loginUser);
 
-// Protected user profile route
+// Protected user profile & wallet routes
 router.get('/profile', protect, getUserProfile);
+router.get('/wallet', protect, getWalletSummary);
+router.post('/wallet/reset', protect, resetVirtualWallet);
 
 module.exports = router;

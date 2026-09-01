@@ -2,13 +2,16 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useGeneralContext } from '../context/GeneralContext';
 
 function Navbar() {
-  const { user, isAuthenticated, logout } = useGeneralContext();
+  const { user, wallet, isAuthenticated, logout } = useGeneralContext();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
+
+  const cash = wallet?.availableBalance ?? user?.virtualBalance ?? 100000;
+  const portfolio = wallet?.portfolioValue ?? 0;
 
   return (
     <nav className="navbar">
@@ -21,10 +24,19 @@ function Navbar() {
           {isAuthenticated ? (
             <>
               <div className="navbar-balance">
-                <span className="balance-label">Virtual Cash:</span>
+                <span className="balance-label">Cash:</span>
                 <span className="balance-amount">
-                  ${user?.virtualBalance ? user.virtualBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '100,000.00'}
+                  ${cash.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
+                {portfolio > 0 && (
+                  <>
+                    <span className="balance-divider">|</span>
+                    <span className="balance-label">Holdings:</span>
+                    <span className="balance-holdings">
+                      ${portfolio.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </>
+                )}
               </div>
               <span className="navbar-user">Hello, {user?.name || 'Trader'}</span>
               <button onClick={handleLogout} className="btn btn-secondary btn-sm">
