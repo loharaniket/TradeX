@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useGeneralContext } from '../context/GeneralContext';
 import axiosInstance from '../axiosInstance';
+import UserDashboard from '../components/UserDashboard';
 
 function Home() {
-  const { user, wallet, fetchWallet, resetWallet, isAuthenticated } = useGeneralContext();
+  const { isAuthenticated } = useGeneralContext();
   const [stocks, setStocks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -48,99 +49,10 @@ function Home() {
     return `$${num.toLocaleString()}`;
   };
 
-  const [resetMessage, setResetMessage] = useState('');
-
-  const handleResetWallet = async () => {
-    if (window.confirm('Reset your virtual cash balance to $100,000.00?')) {
-      const res = await resetWallet();
-      setResetMessage(res.message);
-      setTimeout(() => setResetMessage(''), 4000);
-    }
-  };
-
-  const cash = wallet?.availableBalance ?? user?.virtualBalance ?? 100000;
-  const invested = wallet?.investedAmount ?? 0;
-  const portfolio = wallet?.portfolioValue ?? 0;
-  const totalValue = wallet?.totalAccountValue ?? (cash + portfolio);
-  const pnl = wallet?.unrealizedProfitLoss ?? 0;
-  const pnlPct = wallet?.profitLossPercent ?? 0;
-  const isPnlPositive = pnl >= 0;
-
   return (
     <div className="home-container">
       {isAuthenticated ? (
-        <div className="dashboard-welcome">
-          <div className="welcome-banner">
-            <div className="welcome-banner-text">
-              <h1>Welcome back, {user?.name}! 👋</h1>
-              <p className="welcome-subtitle">
-                Virtual paper trading account is active. Trade top US stocks with risk-free funds.
-              </p>
-            </div>
-            <button
-              onClick={handleResetWallet}
-              className="btn btn-secondary btn-sm reset-wallet-btn"
-              title="Reset virtual balance to $100,000"
-            >
-              🔄 Reset Virtual Cash ($100k)
-            </button>
-          </div>
-
-          {resetMessage && (
-            <div className="alert alert-success mt-2">
-              {resetMessage}
-            </div>
-          )}
-
-          {/* Virtual Wallet Metrics Grid */}
-          <div className="metrics-grid">
-            <div className="metric-card">
-              <span className="metric-icon">💵</span>
-              <div className="metric-info">
-                <span className="metric-label">Available Balance</span>
-                <span className="metric-value">
-                  ${cash.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </span>
-                <span className="metric-hint">Liquid cash for new orders</span>
-              </div>
-            </div>
-
-            <div className="metric-card">
-              <span className="metric-icon">💼</span>
-              <div className="metric-info">
-                <span className="metric-label">Invested Amount</span>
-                <span className="metric-value">
-                  ${invested.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </span>
-                <span className="metric-hint">Cost basis of active holdings</span>
-              </div>
-            </div>
-
-            <div className="metric-card">
-              <span className="metric-icon">📊</span>
-              <div className="metric-info">
-                <span className="metric-label">Portfolio Value</span>
-                <span className="metric-value">
-                  ${portfolio.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </span>
-                <span className={`metric-hint ${isPnlPositive ? 'text-green' : 'text-red'}`}>
-                  P&L: {isPnlPositive ? '+' : ''}${pnl.toFixed(2)} ({isPnlPositive ? '+' : ''}{pnlPct.toFixed(2)}%)
-                </span>
-              </div>
-            </div>
-
-            <div className="metric-card">
-              <span className="metric-icon">🏦</span>
-              <div className="metric-info">
-                <span className="metric-label">Total Account Value</span>
-                <span className="metric-value">
-                  ${totalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </span>
-                <span className="metric-hint">Cash + Stock Portfolio</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <UserDashboard />
       ) : (
         <div className="hero-landing">
           <div className="hero-content">
