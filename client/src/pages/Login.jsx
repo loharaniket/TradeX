@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useGeneralContext } from '../context/GeneralContext';
 
 function Login() {
@@ -11,6 +11,8 @@ function Login() {
 
   const { login, loading } = useGeneralContext();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/';
 
   const handleChange = (e) => {
     setFormData({
@@ -30,7 +32,7 @@ function Login() {
 
     const result = await login(formData.email, formData.password);
     if (result.success) {
-      navigate('/');
+      navigate(from, { replace: true });
     } else {
       setFormError(result.message);
     }

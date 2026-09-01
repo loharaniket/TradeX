@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useGeneralContext } from '../context/GeneralContext';
 
 function Register() {
@@ -14,6 +14,8 @@ function Register() {
 
   const { register, loading } = useGeneralContext();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/';
 
   const handleChange = (e) => {
     setFormData({
@@ -49,7 +51,7 @@ function Register() {
     });
 
     if (result.success) {
-      navigate('/');
+      navigate(from, { replace: true });
     } else {
       setFormError(result.message);
     }

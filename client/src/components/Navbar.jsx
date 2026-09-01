@@ -7,7 +7,7 @@ function Navbar() {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/');
   };
 
   const cash = wallet?.availableBalance ?? user?.virtualBalance ?? 100000;
@@ -38,6 +38,9 @@ function Navbar() {
                   </>
                 )}
               </div>
+              <Link to="/market" className="nav-link font-semibold">
+                Market
+              </Link>
               <Link to="/portfolio" className="nav-link font-semibold">
                 Portfolio
               </Link>
@@ -59,6 +62,9 @@ function Navbar() {
             </>
           ) : (
             <>
+              <Link to="/market" className="nav-link">
+                Market
+              </Link>
               <Link to="/login" className="nav-link">
                 Login
               </Link>
