@@ -1896,6 +1896,211 @@
   opacity: 0.8;
 }
 
+/* Admin Dashboard */
+.admin-dashboard-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.admin-header-banner {
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+  color: #ffffff;
+  padding: 28px 32px;
+  border-radius: 12px;
+  border: 1px solid rgba(199, 210, 254, 0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.admin-banner-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: rgba(99, 102, 241, 0.2);
+  color: #c7d2fe;
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.admin-header-banner h1 {
+  font-size: 1.8rem;
+  margin: 0 0 6px;
+}
+
+.admin-header-sub {
+  color: #94a3b8;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.admin-header-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.admin-user-tag {
+  font-size: 0.82rem;
+  color: #c7d2fe;
+}
+
+.admin-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.admin-metric-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.admin-metric-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.admin-metric-val {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.admin-metric-hint {
+  font-size: 0.82rem;
+  color: #64748b;
+}
+
+.admin-split-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 860px) {
+  .admin-split-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.admin-panel-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.panel-header {
+  margin-bottom: 18px;
+}
+
+.panel-header h2 {
+  font-size: 1.25rem;
+  color: #0f172a;
+  margin: 0 0 4px;
+}
+
+.panel-sub {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.rank-td {
+  width: 40px;
+}
+
+.rank-badge {
+  background-color: #f1f5f9;
+  color: #334155;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.trader-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.trader-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.trader-email {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+/* Admin Gate Access Denied */
+.admin-gate-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 16px;
+}
+
+.admin-gate-card {
+  max-width: 500px;
+  width: 100%;
+  background-color: #ffffff;
+  border: 2px solid #fee2e2;
+  border-radius: 12px;
+  padding: 40px 32px;
+  text-align: center;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+}
+
+.gate-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.admin-gate-card h2 {
+  color: #991b1b;
+  font-size: 1.4rem;
+  margin: 0 0 10px;
+}
+
+.admin-gate-card p {
+  color: #64748b;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0 0 24px;
+}
+
+.gate-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+
 
 
 

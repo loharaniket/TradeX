@@ -8,6 +8,7 @@ import StockChart from './pages/StockChart';
 import Portfolio from './pages/Portfolio';
 import History from './pages/History';
 import AdminLogin from './pages/AdminLogin';
+import AdminDashboard from './pages/AdminDashboard';
 import './App.css';
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
               <Route path="/stocks/:symbol" element={<StockChart />} />
               <Route path="/portfolio" element={<Portfolio />} />
               <Route path="/history" element={<History />} />
