@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { GeneralProvider, useGeneralContext } from './context/GeneralContext';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import Landing from './pages/Landing';
@@ -80,6 +81,7 @@ function App() {
           <main className="main-content">
             <AppRoutes />
           </main>
+          <Footer />
         </div>
       </Router>
     </GeneralProvider>
