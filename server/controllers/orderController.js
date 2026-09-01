@@ -1,32 +1,260 @@
-// Order Controller - handles paper trading buy/sell orders
+const Order = require('../models/orderSchema');
+const Transaction = require('../models/transactionModel');
+const User = require('../models/userModel');
+const Stock = require('../models/stockSchema');
 
-// @desc    Create a new paper trading order (buy or sell)
+// Fallback pricing for supported US stocks
+const DEFAULT_STOCKS_MAP = {
+  AAPL: { companyName: 'Apple Inc.', price: 232.50 },
+  MSFT: { companyName: 'Microsoft Corporation', price: 428.15 },
+  GOOGL: { companyName: 'Alphabet Inc.', price: 165.40 },
+  AMZN: { companyName: 'Amazon.com Inc.', price: 188.90 },
+  TSLA: { companyName: 'Tesla Inc.', price: 218.80 },
+  NVDA: { companyName: 'NVIDIA Corporation', price: 121.25 },
+  META: { companyName: 'Meta Platforms Inc.', price: 512.60 },
+  NFLX: { companyName: 'Netflix Inc.', price: 684.30 },
+  JPM: { companyName: 'JPMorgan Chase & Co.', price: 214.70 },
+  V: { companyName: 'Visa Inc.', price: 272.40 },
+};
+
+// Helper to get current stock price and name
+const getStockPriceAndName = async (symbol) => {
+  const sym = symbol.toUpperCase();
+  try {
+    const stock = await Stock.findOne({ symbol: sym });
+    if (stock && stock.currentPrice) {
+      return {
+        companyName: stock.companyName,
+        currentPrice: stock.currentPrice,
+      };
+    }
+  } catch (err) {
+    // Continue to fallback
+  }
+
+  if (DEFAULT_STOCKS_MAP[sym]) {
+    return {
+      companyName: DEFAULT_STOCKS_MAP[sym].companyName,
+      currentPrice: DEFAULT_STOCKS_MAP[sym].price,
+    };
+  }
+
+  return null;
+};
+
+// @desc    Create a new paper trading order (BUY or SELL)
 // @route   POST /api/orders
+// @access  Protected
 const createOrder = async (req, res) => {
-  res.status(200).json({
-    message: 'Order creation endpoint ready (will be implemented in Phase 10)',
-  });
+  try {
+    const { symbol, orderType, quantity } = req.body;
+
+    // 1. Validate inputs
+    if (!symbol || !orderType || !quantity) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide stock symbol, order type (BUY or SELL), and quantity',
+      });
+    }
+
+    const type = orderType.toUpperCase().trim();
+    if (type !== 'BUY' && type !== 'SELL') {
+      return res.status(400).json({
+        success: false,
+        message: 'Order type must be either BUY or SELL',
+      });
+    }
+
+    const qty = parseInt(quantity, 10);
+    if (isNaN(qty) || qty <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Quantity must be a positive integer greater than 0',
+      });
+    }
+
+    const sym = symbol.toUpperCase().trim();
+
+    // 2. Fetch stock price
+    const stockInfo = await getStockPriceAndName(sym);
+    if (!stockInfo) {
+      return res.status(404).json({
+        success: false,
+        message: `Stock '${sym}' is not currently available for trading`,
+      });
+    }
+
+    const { companyName, currentPrice } = stockInfo;
+    const totalAmount = Number((qty * currentPrice).toFixed(2));
+
+    // 3. Fetch authenticated user
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // 4. Validate order constraints
+    if (type === 'BUY') {
+      // Check if user has enough virtual balance
+      if (user.virtualBalance < totalAmount) {
+        return res.status(400).json({
+          success: false,
+          message: `Insufficient virtual balance. You need $${totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })} but only have $${user.virtualBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}.`,
+        });
+      }
+
+      // Deduct balance
+      user.virtualBalance = Number((user.virtualBalance - totalAmount).toFixed(2));
+    } else if (type === 'SELL') {
+      // Calculate user's owned shares for this stock
+      const userOrders = await Order.find({
+        user: user._id,
+        stock: sym,
+        status: 'COMPLETED',
+      });
+
+      let ownedShares = 0;
+      userOrders.forEach((o) => {
+        if (o.orderType === 'BUY') {
+          ownedShares += o.quantity;
+        } else if (o.orderType === 'SELL') {
+          ownedShares -= o.quantity;
+        }
+      });
+
+      if (ownedShares < qty) {
+        return res.status(400).json({
+          success: false,
+          message: `Insufficient shares to sell. You currently own ${ownedShares} shares of ${sym}, but attempted to sell ${qty}.`,
+        });
+      }
+
+      // Credit balance
+      user.virtualBalance = Number((user.virtualBalance + totalAmount).toFixed(2));
+    }
+
+    // 5. Save updated user virtual balance
+    await user.save();
+
+    // 6. Create completed Order
+    const order = await Order.create({
+      user: user._id,
+      stock: sym,
+      companyName,
+      orderType: type,
+      quantity: qty,
+      price: currentPrice,
+      totalAmount,
+      status: 'COMPLETED',
+    });
+
+    // 7. Create permanent Transaction record
+    const transaction = await Transaction.create({
+      user: user._id,
+      stock: sym,
+      companyName,
+      orderType: type,
+      quantity: qty,
+      price: currentPrice,
+      totalValue: totalAmount,
+      timestamp: new Date(),
+    });
+
+    res.status(201).json({
+      success: true,
+      message: `Successfully ${type === 'BUY' ? 'purchased' : 'sold'} ${qty} shares of ${sym} for $${totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
+      order,
+      transaction,
+      updatedBalance: user.virtualBalance,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: `Failed to execute paper trading order: ${error.message}`,
+    });
+  }
+};
+
+// @desc    Get user's holding quantity for a specific stock
+// @route   GET /api/orders/holding/:symbol
+// @access  Protected
+const getUserStockHolding = async (req, res) => {
+  try {
+    const sym = req.params.symbol.toUpperCase().trim();
+    const orders = await Order.find({
+      user: req.user._id,
+      stock: sym,
+      status: 'COMPLETED',
+    });
+
+    let ownedShares = 0;
+    let totalCost = 0;
+
+    orders.forEach((o) => {
+      if (o.orderType === 'BUY') {
+        ownedShares += o.quantity;
+        totalCost += o.totalAmount;
+      } else if (o.orderType === 'SELL') {
+        if (ownedShares > 0) {
+          const avgCost = totalCost / ownedShares;
+          ownedShares -= o.quantity;
+          totalCost -= o.quantity * avgCost;
+          if (ownedShares <= 0) {
+            ownedShares = 0;
+            totalCost = 0;
+          }
+        }
+      }
+    });
+
+    const averageBuyPrice = ownedShares > 0 ? Number((totalCost / ownedShares).toFixed(2)) : 0;
+
+    res.status(200).json({
+      success: true,
+      symbol: sym,
+      ownedShares,
+      averageBuyPrice,
+      totalInvested: Number(totalCost.toFixed(2)),
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
 
 // @desc    Get all orders for the logged-in user
 // @route   GET /api/orders
+// @access  Protected
 const getUserOrders = async (req, res) => {
-  res.status(200).json({
-    message: 'User orders endpoint ready (will be implemented in Phase 10)',
-    orders: [],
-  });
+  try {
+    const orders = await Order.find({ user: req.user._id }).sort({ createdAt: -1 });
+    res.status(200).json({
+      success: true,
+      count: orders.length,
+      orders,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
 
 // @desc    Get order details by order ID
 // @route   GET /api/orders/:id
+// @access  Protected
 const getOrderById = async (req, res) => {
-  res.status(200).json({
-    message: `Order detail endpoint for ${req.params.id} ready`,
-  });
+  try {
+    const order = await Order.findOne({ _id: req.params.id, user: req.user._id });
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+    res.status(200).json({ success: true, order });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
 
 module.exports = {
   createOrder,
   getUserOrders,
   getOrderById,
+  getUserStockHolding,
 };
