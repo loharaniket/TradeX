@@ -1,13 +1,24 @@
 const mongoose = require('mongoose');
 
-// Connect to MongoDB database
+// Connect to Cloud MongoDB (e.g., MongoDB Atlas) using Mongoose
 const connectDB = async () => {
+  const mongoURI = process.env.MONGO_URI;
+
+  if (!mongoURI) {
+    console.warn('Warning: MONGO_URI is not defined in server/.env file.');
+    console.warn('Please add your Cloud MongoDB connection string to server/.env');
+    return;
+  }
+
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/sb-stocks');
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
+    const conn = await mongoose.connect(mongoURI);
+    console.log(`Cloud MongoDB Connected successfully: ${conn.connection.host}`);
   } catch (error) {
-    console.error(`MongoDB Connection Error: ${error.message}`);
-    // Do not terminate process in setup phase so server can still run if Mongo is offline
+    console.error(`Cloud MongoDB Connection Error: ${error.message}`);
+    console.log('Troubleshooting tips for MongoDB Atlas:');
+    console.log('1. Verify your database username and password in server/.env');
+    console.log('2. Ensure your IP address is allowed in Atlas Network Access (e.g., allow 0.0.0.0/0 for development)');
+    console.log('3. Ensure the database name is specified in the URI');
   }
 };
 
