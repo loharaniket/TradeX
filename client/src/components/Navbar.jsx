@@ -41,6 +41,9 @@ function Navbar() {
               <Link to="/portfolio" className="nav-link font-semibold">
                 Portfolio
               </Link>
+              <Link to="/history" className="nav-link font-semibold">
+                History
+              </Link>
               <span className="navbar-user">Hello, {user?.name || 'Trader'}</span>
               <button onClick={handleLogout} className="btn btn-secondary btn-sm">
                 Logout

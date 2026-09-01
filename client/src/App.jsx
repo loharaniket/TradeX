@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import StockChart from './pages/StockChart';
 import Portfolio from './pages/Portfolio';
+import History from './pages/History';
 import './App.css';
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/stocks/:symbol" element={<StockChart />} />
               <Route path="/portfolio" element={<Portfolio />} />
+              <Route path="/history" element={<History />} />
             </Routes>
           </main>
         </div>
