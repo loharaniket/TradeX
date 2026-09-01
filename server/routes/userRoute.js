@@ -5,6 +5,7 @@ const {
   loginUser,
   adminLogin,
   getUserProfile,
+  updateUserProfile,
   getWalletSummary,
   resetVirtualWallet,
 } = require('../controllers/userController');
@@ -19,6 +20,7 @@ router.post('/admin/login', adminLogin);
 
 // Protected user profile & wallet routes
 router.get('/profile', protect, getUserProfile);
+router.put('/profile', protect, updateUserProfile);
 router.get('/wallet', protect, getWalletSummary);
 router.post('/wallet/reset', protect, resetVirtualWallet);
 

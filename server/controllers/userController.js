@@ -99,21 +99,101 @@ const loginUser = async (req, res) => {
 // @desc    Get logged-in user profile
 // @route   GET /api/users/profile
 // @access  Protected
+// @desc    Get logged-in user profile with trading statistics
+// @route   GET /api/users/profile
+// @access  Protected
 const getUserProfile = async (req, res) => {
   try {
-    // req.user is set by authMiddleware protect function
     if (!req.user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
+    const user = await User.findById(req.user._id).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Compute trading statistics from completed orders
+    let totalTrades = 0;
+    let totalBuys = 0;
+    let totalSells = 0;
+    let totalTurnover = 0;
+    let mostActiveTicker = 'N/A';
+
+    try {
+      const orders = await Order.find({ user: user._id, status: 'COMPLETED' });
+      totalTrades = orders.length;
+
+      const tickerCounts = {};
+      orders.forEach((o) => {
+        if (o.orderType === 'BUY') totalBuys += 1;
+        if (o.orderType === 'SELL') totalSells += 1;
+        totalTurnover += o.totalAmount;
+
+        const sym = o.stock.toUpperCase();
+        tickerCounts[sym] = (tickerCounts[sym] || 0) + 1;
+      });
+
+      let highestCount = 0;
+      for (const [sym, count] of Object.entries(tickerCounts)) {
+        if (count > highestCount) {
+          highestCount = count;
+          mostActiveTicker = sym;
+        }
+      }
+    } catch {
+      // Fallback
+    }
+
     res.status(200).json({
-      _id: req.user._id,
-      name: req.user.name,
-      email: req.user.email,
-      contact: req.user.contact,
-      virtualBalance: req.user.virtualBalance,
-      role: req.user.role,
-      createdAt: req.user.createdAt,
+      success: true,
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      contact: user.contact,
+      virtualBalance: user.virtualBalance,
+      role: user.role,
+      createdAt: user.createdAt,
+      stats: {
+        totalTrades,
+        totalBuys,
+        totalSells,
+        totalTurnover: Number(totalTurnover.toFixed(2)),
+        mostActiveTicker,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ message: `Server error: ${error.message}` });
+  }
+};
+
+// @desc    Update user profile details (name, contact)
+// @route   PUT /api/users/profile
+// @access  Protected
+const updateUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const { name, contact } = req.body;
+    if (name) user.name = name.trim();
+    if (contact !== undefined) user.contact = contact.trim();
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Profile updated successfully',
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        contact: user.contact,
+        role: user.role,
+        virtualBalance: user.virtualBalance,
+      },
     });
   } catch (error) {
     res.status(500).json({ message: `Server error: ${error.message}` });
@@ -302,6 +382,7 @@ module.exports = {
   loginUser,
   adminLogin,
   getUserProfile,
+  updateUserProfile,
   getWalletSummary,
   resetVirtualWallet,
 };

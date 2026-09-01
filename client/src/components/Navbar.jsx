@@ -44,6 +44,9 @@ function Navbar() {
               <Link to="/history" className="nav-link font-semibold">
                 History
               </Link>
+              <Link to="/profile" className="nav-link font-semibold">
+                Profile
+              </Link>
               {isAdmin && (
                 <Link to="/admin/dashboard" className="nav-link nav-link-admin">
                   🛡️ Admin Panel
