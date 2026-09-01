@@ -2,20 +2,6 @@ const Order = require('../models/orderSchema');
 const Stock = require('../models/stockSchema');
 const User = require('../models/userModel');
 
-// Baseline stock information fallback
-const DEFAULT_STOCKS = {
-  AAPL: { companyName: 'Apple Inc.', price: 232.50 },
-  MSFT: { companyName: 'Microsoft Corporation', price: 428.15 },
-  GOOGL: { companyName: 'Alphabet Inc.', price: 165.40 },
-  AMZN: { companyName: 'Amazon.com Inc.', price: 188.90 },
-  TSLA: { companyName: 'Tesla Inc.', price: 218.80 },
-  NVDA: { companyName: 'NVIDIA Corporation', price: 121.25 },
-  META: { companyName: 'Meta Platforms Inc.', price: 512.60 },
-  NFLX: { companyName: 'Netflix Inc.', price: 684.30 },
-  JPM: { companyName: 'JPMorgan Chase & Co.', price: 214.70 },
-  V: { companyName: 'Visa Inc.', price: 272.40 },
-};
-
 // @desc    Get complete user portfolio with holdings, current prices, and P&L
 // @route   GET /api/portfolio
 // @access  Protected
@@ -37,23 +23,27 @@ const getPortfolio = async (req, res) => {
       if (!holdingsMap[sym]) {
         holdingsMap[sym] = {
           symbol: sym,
-          companyName: order.companyName || DEFAULT_STOCKS[sym]?.companyName || sym,
+          companyName: order.companyName || sym,
           quantity: 0,
+          shares: 0,
           totalCost: 0,
         };
       }
 
       if (order.orderType === 'BUY') {
         holdingsMap[sym].quantity += order.quantity;
+        holdingsMap[sym].shares += order.quantity;
         holdingsMap[sym].totalCost += order.totalAmount;
       } else if (order.orderType === 'SELL') {
         if (holdingsMap[sym].quantity > 0) {
           const avgCost = holdingsMap[sym].totalCost / holdingsMap[sym].quantity;
           holdingsMap[sym].quantity -= order.quantity;
+          holdingsMap[sym].shares -= order.quantity;
           holdingsMap[sym].totalCost -= order.quantity * avgCost;
 
           if (holdingsMap[sym].quantity <= 0) {
             holdingsMap[sym].quantity = 0;
+            holdingsMap[sym].shares = 0;
             holdingsMap[sym].totalCost = 0;
           }
         }
@@ -68,7 +58,7 @@ const getPortfolio = async (req, res) => {
     for (const sym of Object.keys(holdingsMap)) {
       const item = holdingsMap[sym];
       if (item.quantity > 0) {
-        let currentPrice = DEFAULT_STOCKS[sym]?.price || (item.totalCost / item.quantity);
+        let currentPrice = item.totalCost / item.quantity;
 
         try {
           const stockDoc = await Stock.findOne({ symbol: sym });
@@ -95,10 +85,12 @@ const getPortfolio = async (req, res) => {
           symbol: item.symbol,
           companyName: item.companyName,
           quantity: item.quantity,
+          shares: item.quantity,
           averageBuyPrice,
           currentPrice: Number(currentPrice.toFixed(2)),
           investedAmount,
           currentValue,
+          currentValuation: currentValue,
           unrealizedProfitLoss,
           profitLossPercent,
         });
@@ -112,18 +104,24 @@ const getPortfolio = async (req, res) => {
       ? Number(((totalProfitLoss / totalInvested) * 100).toFixed(2))
       : 0;
 
+    const summary = {
+      availableCash,
+      totalInvested: Number(totalInvested.toFixed(2)),
+      totalPortfolioValue: Number(totalPortfolioValue.toFixed(2)),
+      totalProfitLoss,
+      totalProfitLossPercent,
+      totalNetWorth,
+      holdingsCount: activeHoldings.length,
+    };
+
     res.status(200).json({
       success: true,
-      summary: {
-        availableCash,
-        totalInvested: Number(totalInvested.toFixed(2)),
-        totalPortfolioValue: Number(totalPortfolioValue.toFixed(2)),
-        totalProfitLoss,
-        totalProfitLossPercent,
-        totalNetWorth,
-        holdingsCount: activeHoldings.length,
-      },
+      summary,
       holdings: activeHoldings,
+      portfolio: {
+        summary,
+        holdings: activeHoldings,
+      },
     });
   } catch (error) {
     res.status(500).json({

@@ -22,12 +22,6 @@ function AdminLogin() {
     }
   };
 
-  const handleFillDemo = () => {
-    setEmail('admin@tradex.com');
-    setPassword('Admin@12345');
-    setErrorMessage('');
-  };
-
   return (
     <div className="admin-login-container">
       <div className="admin-login-card">
@@ -42,18 +36,6 @@ function AdminLogin() {
             {errorMessage}
           </div>
         )}
-
-        {/* Demo Credentials Box */}
-        <div className="admin-demo-box">
-          <div className="demo-info">
-            <span className="demo-badge">Default Admin Credentials</span>
-            <p><strong>Email:</strong> admin@tradex.com</p>
-            <p><strong>Password:</strong> Admin@12345</p>
-          </div>
-          <button type="button" onClick={handleFillDemo} className="btn-fill-demo">
-            Auto-Fill Demo Admin
-          </button>
-        </div>
 
         <form onSubmit={handleSubmit} className="admin-login-form">
           <div className="form-group">

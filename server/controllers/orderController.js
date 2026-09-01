@@ -3,23 +3,9 @@ const Transaction = require('../models/transactionModel');
 const User = require('../models/userModel');
 const Stock = require('../models/stockSchema');
 
-// Fallback pricing for supported US stocks
-const DEFAULT_STOCKS_MAP = {
-  AAPL: { companyName: 'Apple Inc.', price: 232.50 },
-  MSFT: { companyName: 'Microsoft Corporation', price: 428.15 },
-  GOOGL: { companyName: 'Alphabet Inc.', price: 165.40 },
-  AMZN: { companyName: 'Amazon.com Inc.', price: 188.90 },
-  TSLA: { companyName: 'Tesla Inc.', price: 218.80 },
-  NVDA: { companyName: 'NVIDIA Corporation', price: 121.25 },
-  META: { companyName: 'Meta Platforms Inc.', price: 512.60 },
-  NFLX: { companyName: 'Netflix Inc.', price: 684.30 },
-  JPM: { companyName: 'JPMorgan Chase & Co.', price: 214.70 },
-  V: { companyName: 'Visa Inc.', price: 272.40 },
-};
-
-// Helper to get current stock price and name
+// Helper to get current stock price and name from Stock collection
 const getStockPriceAndName = async (symbol) => {
-  const sym = symbol.toUpperCase();
+  const sym = symbol.toUpperCase().trim();
   try {
     const stock = await Stock.findOne({ symbol: sym });
     if (stock && stock.currentPrice) {
@@ -29,18 +15,9 @@ const getStockPriceAndName = async (symbol) => {
         tradingEnabled: stock.tradingEnabled !== false,
       };
     }
-  } catch (err) {
-    // Continue to fallback
+  } catch {
+    // Continue
   }
-
-  if (DEFAULT_STOCKS_MAP[sym]) {
-    return {
-      companyName: DEFAULT_STOCKS_MAP[sym].companyName,
-      currentPrice: DEFAULT_STOCKS_MAP[sym].price,
-      tradingEnabled: true,
-    };
-  }
-
   return null;
 };
 
@@ -96,39 +73,23 @@ const createOrder = async (req, res) => {
     const { companyName, currentPrice } = stockInfo;
     const totalAmount = Number((qty * currentPrice).toFixed(2));
 
-    // 3. Fetch authenticated user
     const user = await User.findById(req.user._id);
-    if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
-    }
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
 
-    // 4. Validate order constraints
     if (type === 'BUY') {
-      // Check if user has enough virtual balance
       if (user.virtualBalance < totalAmount) {
         return res.status(400).json({
           success: false,
           message: `Insufficient virtual balance. You need $${totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })} but only have $${user.virtualBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}.`,
         });
       }
-
-      // Deduct balance
       user.virtualBalance = Number((user.virtualBalance - totalAmount).toFixed(2));
     } else if (type === 'SELL') {
-      // Calculate user's owned shares for this stock
-      const userOrders = await Order.find({
-        user: user._id,
-        stock: sym,
-        status: 'COMPLETED',
-      });
-
+      const userOrders = await Order.find({ user: user._id, stock: sym, status: 'COMPLETED' });
       let ownedShares = 0;
       userOrders.forEach((o) => {
-        if (o.orderType === 'BUY') {
-          ownedShares += o.quantity;
-        } else if (o.orderType === 'SELL') {
-          ownedShares -= o.quantity;
-        }
+        if (o.orderType === 'BUY') ownedShares += o.quantity;
+        else if (o.orderType === 'SELL') ownedShares -= o.quantity;
       });
 
       if (ownedShares < qty) {
@@ -137,15 +98,11 @@ const createOrder = async (req, res) => {
           message: `Insufficient shares to sell. You currently own ${ownedShares} shares of ${sym}, but attempted to sell ${qty}.`,
         });
       }
-
-      // Credit balance
       user.virtualBalance = Number((user.virtualBalance + totalAmount).toFixed(2));
     }
 
-    // 5. Save updated user virtual balance
     await user.save();
 
-    // 6. Create completed Order
     const order = await Order.create({
       user: user._id,
       stock: sym,
@@ -157,7 +114,6 @@ const createOrder = async (req, res) => {
       status: 'COMPLETED',
     });
 
-    // 7. Create permanent Transaction record
     const transaction = await Transaction.create({
       user: user._id,
       stock: sym,
@@ -175,6 +131,7 @@ const createOrder = async (req, res) => {
       order,
       transaction,
       updatedBalance: user.virtualBalance,
+      userRemainingBalance: user.virtualBalance,
     });
   } catch (error) {
     res.status(500).json({
@@ -190,11 +147,7 @@ const createOrder = async (req, res) => {
 const getUserStockHolding = async (req, res) => {
   try {
     const sym = req.params.symbol.toUpperCase().trim();
-    const orders = await Order.find({
-      user: req.user._id,
-      stock: sym,
-      status: 'COMPLETED',
-    });
+    const orders = await Order.find({ user: req.user._id, stock: sym, status: 'COMPLETED' });
 
     let ownedShares = 0;
     let totalCost = 0;
@@ -236,11 +189,7 @@ const getUserStockHolding = async (req, res) => {
 const getUserOrders = async (req, res) => {
   try {
     const orders = await Order.find({ user: req.user._id }).sort({ createdAt: -1 });
-    res.status(200).json({
-      success: true,
-      count: orders.length,
-      orders,
-    });
+    res.status(200).json({ success: true, count: orders.length, orders });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -252,9 +201,7 @@ const getUserOrders = async (req, res) => {
 const getOrderById = async (req, res) => {
   try {
     const order = await Order.findOne({ _id: req.params.id, user: req.user._id });
-    if (!order) {
-      return res.status(404).json({ success: false, message: 'Order not found' });
-    }
+    if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
     res.status(200).json({ success: true, order });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

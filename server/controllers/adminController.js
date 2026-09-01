@@ -22,7 +22,7 @@ const getAdminDashboard = async (req, res) => {
     ]);
     const totalPlatformVolume = volumeResult[0]?.total || 0;
 
-    // 3. Most Traded Stocks (aggregated by trade frequency & volume)
+    // 3. Most Traded Stocks
     const mostTradedAgg = await Order.aggregate([
       { $match: { status: 'COMPLETED' } },
       {
@@ -38,7 +38,7 @@ const getAdminDashboard = async (req, res) => {
       { $limit: 6 },
     ]);
 
-    let mostTradedStocks = mostTradedAgg.map((item) => ({
+    const mostTradedStocks = mostTradedAgg.map((item) => ({
       symbol: item._id,
       companyName: item.companyName || item._id,
       tradesCount: item.tradesCount,
@@ -46,17 +46,7 @@ const getAdminDashboard = async (req, res) => {
       totalShares: item.totalShares,
     }));
 
-    // Fallback if platform has few or no trades yet
-    if (mostTradedStocks.length === 0) {
-      mostTradedStocks = [
-        { symbol: 'NVDA', companyName: 'NVIDIA Corporation', tradesCount: 0, totalVolume: 0, totalShares: 0 },
-        { symbol: 'AAPL', companyName: 'Apple Inc.', tradesCount: 0, totalVolume: 0, totalShares: 0 },
-        { symbol: 'TSLA', companyName: 'Tesla Inc.', tradesCount: 0, totalVolume: 0, totalShares: 0 },
-        { symbol: 'MSFT', companyName: 'Microsoft Corporation', tradesCount: 0, totalVolume: 0, totalShares: 0 },
-      ];
-    }
-
-    // 4. Recent Platform Activity (Latest 10 trades across all platform users)
+    // 4. Recent Platform Activity
     const recentOrders = await Order.find({ status: 'COMPLETED' })
       .sort({ createdAt: -1 })
       .limit(10)
@@ -76,8 +66,7 @@ const getAdminDashboard = async (req, res) => {
       status: ord.status,
     }));
 
-    // 5. Total stocks listed
-    const activeStocksCount = (await Stock.countDocuments({})) || 10;
+    const activeStocksCount = await Stock.countDocuments({});
 
     res.status(200).json({
       success: true,
@@ -106,11 +95,7 @@ const getAdminDashboard = async (req, res) => {
 const getAllUsers = async (req, res) => {
   try {
     const users = await User.find({}).select('-password').sort({ createdAt: -1 });
-    res.status(200).json({
-      success: true,
-      count: users.length,
-      users,
-    });
+    res.status(200).json({ success: true, count: users.length, users });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -163,9 +148,7 @@ const adjustUserBalance = async (req, res) => {
     }
 
     const user = await User.findById(req.params.id);
-    if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
-    }
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
 
     user.virtualBalance = Number(newBal.toFixed(2));
     await user.save();
@@ -173,12 +156,7 @@ const adjustUserBalance = async (req, res) => {
     res.status(200).json({
       success: true,
       message: `Virtual balance for ${user.name} updated to $${user.virtualBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
-      user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        virtualBalance: user.virtualBalance,
-      },
+      user: { _id: user._id, name: user.name, email: user.email, virtualBalance: user.virtualBalance },
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -191,10 +169,9 @@ const adjustUserBalance = async (req, res) => {
 const toggleStockStatus = async (req, res) => {
   try {
     const sym = req.params.symbol.toUpperCase().trim();
-    let stock = await Stock.findOne({ symbol: sym });
 
+    let stock = await Stock.findOne({ symbol: sym });
     if (!stock) {
-      // If stock not found in DB yet, create it with active state
       stock = await Stock.create({
         symbol: sym,
         companyName: `${sym} Corporation`,

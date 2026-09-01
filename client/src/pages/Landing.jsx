@@ -22,15 +22,7 @@ function Landing() {
           setHighlights(res.data.stocks.slice(0, 6));
         }
       } catch {
-        // Fallback default US stocks
-        setHighlights([
-          { symbol: 'NVDA', companyName: 'NVIDIA Corporation', currentPrice: 121.25, changePercent: 4.22 },
-          { symbol: 'TSLA', companyName: 'Tesla Inc.', currentPrice: 218.8, changePercent: 3.84 },
-          { symbol: 'AAPL', companyName: 'Apple Inc.', currentPrice: 232.5, changePercent: 1.45 },
-          { symbol: 'MSFT', companyName: 'Microsoft Corporation', currentPrice: 428.15, changePercent: 0.85 },
-          { symbol: 'AMZN', companyName: 'Amazon.com Inc.', currentPrice: 188.9, changePercent: 1.12 },
-          { symbol: 'META', companyName: 'Meta Platforms Inc.', currentPrice: 512.6, changePercent: 2.15 },
-        ]);
+        setHighlights([]);
       }
     };
 

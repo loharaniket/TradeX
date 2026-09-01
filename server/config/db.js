@@ -11,7 +11,7 @@ const connectDB = async () => {
   }
 
   try {
-    const conn = await mongoose.connect(mongoURI);
+    const conn = await mongoose.connect(mongoURI, { dbName: 'tradex' });
     console.log(`Cloud MongoDB Connected successfully: ${conn.connection.host}`);
   } catch (error) {
     console.error(`Cloud MongoDB Connection Error: ${error.message}`);

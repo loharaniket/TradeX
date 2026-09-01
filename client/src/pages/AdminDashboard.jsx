@@ -529,60 +529,54 @@ function AdminDashboard() {
               </div>
 
               <div className="stock-table-container">
-                <table className="stock-table">
-                  <thead>
-                    <tr>
-                      <th>Ticker</th>
-                      <th>Company</th>
-                      <th className="text-right">Price</th>
-                      <th className="text-center">Trading Status</th>
-                      <th className="text-right">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(stocksList.length > 0
-                      ? stocksList
-                      : [
-                          { symbol: 'AAPL', companyName: 'Apple Inc.', currentPrice: 232.5, tradingEnabled: true },
-                          { symbol: 'MSFT', companyName: 'Microsoft Corporation', currentPrice: 428.15, tradingEnabled: true },
-                          { symbol: 'NVDA', companyName: 'NVIDIA Corporation', currentPrice: 121.25, tradingEnabled: true },
-                          { symbol: 'TSLA', companyName: 'Tesla Inc.', currentPrice: 218.8, tradingEnabled: true },
-                          { symbol: 'GOOGL', companyName: 'Alphabet Inc.', currentPrice: 165.4, tradingEnabled: true },
-                          { symbol: 'AMZN', companyName: 'Amazon.com Inc.', currentPrice: 188.9, tradingEnabled: true },
-                          { symbol: 'META', companyName: 'Meta Platforms Inc.', currentPrice: 512.6, tradingEnabled: true },
-                          { symbol: 'NFLX', companyName: 'Netflix Inc.', currentPrice: 684.3, tradingEnabled: true },
-                        ]
-                    ).map((stk) => {
-                      const isEnabled = stk.tradingEnabled !== false;
-                      return (
-                        <tr key={stk.symbol} className="stock-row">
-                          <td>
-                            <span className="stock-symbol-badge">{stk.symbol}</span>
-                          </td>
-                          <td>
-                            <strong>{stk.companyName}</strong>
-                          </td>
-                          <td className="text-right font-bold">
-                            ${stk.currentPrice?.toFixed(2)}
-                          </td>
-                          <td className="text-center">
-                            <span className={`status-pill ${isEnabled ? 'status-pill-active' : 'status-pill-suspended'}`}>
-                              {isEnabled ? '● Active (Trading Open)' : '✕ Suspended'}
-                            </span>
-                          </td>
-                          <td className="text-right">
-                            <button
-                              onClick={() => handleToggleStock(stk.symbol)}
-                              className={`btn btn-xs ${isEnabled ? 'btn-danger' : 'btn-primary'}`}
-                            >
-                              {isEnabled ? 'Suspend Trading' : 'Enable Trading'}
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                {stocksList.length > 0 ? (
+                  <table className="stock-table">
+                    <thead>
+                      <tr>
+                        <th>Ticker</th>
+                        <th>Company</th>
+                        <th className="text-right">Price</th>
+                        <th className="text-center">Trading Status</th>
+                        <th className="text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {stocksList.map((stk) => {
+                        const isEnabled = stk.tradingEnabled !== false;
+                        return (
+                          <tr key={stk.symbol} className="stock-row">
+                            <td>
+                              <span className="stock-symbol-badge">{stk.symbol}</span>
+                            </td>
+                            <td>
+                              <strong>{stk.companyName}</strong>
+                            </td>
+                            <td className="text-right font-bold">
+                              ${stk.currentPrice?.toFixed(2)}
+                            </td>
+                            <td className="text-center">
+                              <span className={`status-pill ${isEnabled ? 'status-pill-active' : 'status-pill-suspended'}`}>
+                                {isEnabled ? '● Active (Trading Open)' : '✕ Suspended'}
+                              </span>
+                            </td>
+                            <td className="text-right">
+                              <button
+                                onClick={() => handleToggleStock(stk.symbol)}
+                                className={`btn btn-xs ${isEnabled ? 'btn-danger' : 'btn-primary'}`}
+                              >
+                                {isEnabled ? 'Suspend Trading' : 'Enable Trading'}
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                ) : (
+                  <div className="dash-empty-box">
+                    <p>No stocks currently loaded from the database.</p>
+                  </div>
+                )}
               </div>
             </div>
           )}
