@@ -26,6 +26,7 @@ const getStockPriceAndName = async (symbol) => {
       return {
         companyName: stock.companyName,
         currentPrice: stock.currentPrice,
+        tradingEnabled: stock.tradingEnabled !== false,
       };
     }
   } catch (err) {
@@ -36,6 +37,7 @@ const getStockPriceAndName = async (symbol) => {
     return {
       companyName: DEFAULT_STOCKS_MAP[sym].companyName,
       currentPrice: DEFAULT_STOCKS_MAP[sym].price,
+      tradingEnabled: true,
     };
   }
 
@@ -75,12 +77,19 @@ const createOrder = async (req, res) => {
 
     const sym = symbol.toUpperCase().trim();
 
-    // 2. Fetch stock price
+    // 2. Fetch stock price & trading status
     const stockInfo = await getStockPriceAndName(sym);
     if (!stockInfo) {
       return res.status(404).json({
         success: false,
         message: `Stock '${sym}' is not currently available for trading`,
+      });
+    }
+
+    if (stockInfo.tradingEnabled === false) {
+      return res.status(400).json({
+        success: false,
+        message: `Trading for ${sym} is currently suspended by the platform administrator.`,
       });
     }
 

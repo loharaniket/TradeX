@@ -2100,6 +2100,98 @@
   gap: 12px;
 }
 
+/* Admin Management Tabs & Tools */
+.admin-tabs-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.admin-tab-btn {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.admin-tab-btn:hover {
+  background-color: #f1f5f9;
+}
+
+.admin-tab-btn.active-admin-tab {
+  background-color: #0f172a;
+  border-color: #0f172a;
+  color: #ffffff;
+}
+
+.role-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+  text-transform: uppercase;
+}
+
+.role-badge-admin {
+  background-color: #ede9fe;
+  color: #6d28d9;
+}
+
+.role-badge-user {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+.balance-edit-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.balance-edit-input {
+  width: 90px;
+  padding: 4px 6px;
+  font-size: 0.8rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+}
+
+.status-pill {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.status-pill-active {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.status-pill-suspended {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.btn-danger {
+  background-color: #dc2626;
+  color: #ffffff;
+}
+
+.btn-danger:hover {
+  background-color: #b91c1c;
+}
+
+
 
 
 

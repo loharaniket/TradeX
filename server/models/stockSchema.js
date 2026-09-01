@@ -39,6 +39,10 @@ const stockSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    tradingEnabled: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true,
