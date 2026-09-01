@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import StockChart from './pages/StockChart';
+import Portfolio from './pages/Portfolio';
 import './App.css';
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/stocks/:symbol" element={<StockChart />} />
+              <Route path="/portfolio" element={<Portfolio />} />
             </Routes>
           </main>
         </div>

@@ -13,6 +13,7 @@ const userRoute = require('./routes/userRoute');
 const stockRoute = require('./routes/stockRoute');
 const orderRoute = require('./routes/orderRoute');
 const transactionRoute = require('./routes/transactionRoute');
+const portfolioRoute = require('./routes/portfolioRoute');
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -29,6 +30,7 @@ app.use('/api/users', userRoute);
 app.use('/api/stocks', stockRoute);
 app.use('/api/orders', orderRoute);
 app.use('/api/transactions', transactionRoute);
+app.use('/api/portfolio', portfolioRoute);
 
 // Basic health check route
 app.get('/', (req, res) => {

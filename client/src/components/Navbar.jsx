@@ -38,6 +38,9 @@ function Navbar() {
                   </>
                 )}
               </div>
+              <Link to="/portfolio" className="nav-link font-semibold">
+                Portfolio
+              </Link>
               <span className="navbar-user">Hello, {user?.name || 'Trader'}</span>
               <button onClick={handleLogout} className="btn btn-secondary btn-sm">
                 Logout
