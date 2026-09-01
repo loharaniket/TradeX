@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useGeneralContext } from '../context/GeneralContext';
 
 function Navbar() {
-  const { user, wallet, isAuthenticated, logout } = useGeneralContext();
+  const { user, wallet, isAuthenticated, isAdmin, logout } = useGeneralContext();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -44,6 +44,11 @@ function Navbar() {
               <Link to="/history" className="nav-link font-semibold">
                 History
               </Link>
+              {isAdmin && (
+                <Link to="/admin/dashboard" className="nav-link nav-link-admin">
+                  🛡️ Admin Panel
+                </Link>
+              )}
               <span className="navbar-user">Hello, {user?.name || 'Trader'}</span>
               <button onClick={handleLogout} className="btn btn-secondary btn-sm">
                 Logout
@@ -56,6 +61,9 @@ function Navbar() {
               </Link>
               <Link to="/register" className="btn btn-primary btn-sm">
                 Register
+              </Link>
+              <Link to="/admin/login" className="nav-link nav-link-admin-subtle" title="Admin Portal">
+                🛡️ Admin
               </Link>
             </>
           )}

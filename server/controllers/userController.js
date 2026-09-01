@@ -220,9 +220,87 @@ const resetVirtualWallet = async (req, res) => {
   }
 };
 
+// @desc    Admin login with role-based authorization check
+// @route   POST /api/users/admin/login
+// @access  Public (admin credentials)
+const adminLogin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide administrator email and password',
+      });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+
+    // Auto-seed default admin if logging in with default credentials for the first time
+    if (normalizedEmail === 'admin@tradex.com') {
+      const existingAdmin = await User.findOne({ email: normalizedEmail });
+      if (!existingAdmin) {
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash('Admin@12345', salt);
+        await User.create({
+          name: 'TradeX Admin',
+          email: 'admin@tradex.com',
+          password: hashedPassword,
+          contact: '1800-TRADEX',
+          role: 'admin',
+          virtualBalance: 1000000,
+        });
+      }
+    }
+
+    // Find user by email
+    const user = await User.findOne({ email: normalizedEmail });
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid administrator credentials',
+      });
+    }
+
+    // Verify password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid administrator credentials',
+      });
+    }
+
+    // Crucial check: verify role is admin
+    if (user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied: This account does not possess administrator privileges',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      virtualBalance: user.virtualBalance,
+      token: generateToken(user._id),
+      message: 'Administrator authentication successful',
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: `Admin login server error: ${error.message}`,
+    });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
+  adminLogin,
   getUserProfile,
   getWalletSummary,
   resetVirtualWallet,

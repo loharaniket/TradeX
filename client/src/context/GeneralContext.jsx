@@ -149,6 +149,29 @@ export const GeneralProvider = ({ children }) => {
     }
   };
 
+  // Admin Login function
+  const adminLogin = async (email, password) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axiosInstance.post('/users/admin/login', { email, password });
+      const data = response.data;
+
+      setUser(data);
+      setToken(data.token);
+      localStorage.setItem('user', JSON.stringify(data));
+      localStorage.setItem('token', data.token);
+
+      setLoading(false);
+      return { success: true, user: data };
+    } catch (err) {
+      setLoading(false);
+      const message = err.response?.data?.message || 'Admin login failed. Please verify credentials.';
+      setError(message);
+      return { success: false, message };
+    }
+  };
+
   return (
     <GeneralContext.Provider
       value={{
@@ -159,12 +182,14 @@ export const GeneralProvider = ({ children }) => {
         error,
         setError,
         login,
+        adminLogin,
         register,
         logout,
         fetchProfile,
         fetchWallet,
         resetWallet,
         isAuthenticated: !!token,
+        isAdmin: user?.role === 'admin',
       }}
     >
       {children}

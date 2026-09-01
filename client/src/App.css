@@ -1763,6 +1763,140 @@
   gap: 12px;
 }
 
+/* Admin Authentication Portal */
+.admin-login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 16px;
+}
+
+.admin-login-card {
+  width: 100%;
+  max-width: 460px;
+  background-color: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 36px 32px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+}
+
+.admin-login-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.admin-shield-icon {
+  font-size: 3rem;
+  margin-bottom: 12px;
+}
+
+.admin-login-header h2 {
+  font-size: 1.6rem;
+  color: #0f172a;
+  margin: 0 0 6px;
+}
+
+.admin-login-subtitle {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.admin-demo-box {
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.demo-info {
+  font-size: 0.85rem;
+  color: #1e3a8a;
+}
+
+.demo-info p {
+  margin: 2px 0 0;
+}
+
+.demo-badge {
+  display: inline-block;
+  background-color: #dbeafe;
+  color: #1d4ed8;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.btn-fill-demo {
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.btn-fill-demo:hover {
+  background-color: #1d4ed8;
+}
+
+.admin-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.btn-admin-submit {
+  background-color: #0f172a;
+  color: #ffffff;
+  margin-top: 8px;
+}
+
+.btn-admin-submit:hover:not(:disabled) {
+  background-color: #1e293b;
+}
+
+.admin-login-footer {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.nav-link-admin {
+  background-color: #f8fafc;
+  color: #4338ca !important;
+  border: 1px solid #c7d2fe;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.nav-link-admin:hover {
+  background-color: #e0e7ff;
+}
+
+.nav-link-admin-subtle {
+  font-size: 0.82rem;
+  color: #64748b !important;
+  opacity: 0.8;
+}
+
+
 
 
 

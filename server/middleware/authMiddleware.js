@@ -29,7 +29,7 @@ const protect = async (req, res, next) => {
 
       req.user = user;
       next();
-    } catch (error) {
+    } catch {
       return res.status(401).json({ message: 'Not authorized, invalid token' });
     }
   } else {
@@ -37,4 +37,16 @@ const protect = async (req, res, next) => {
   }
 };
 
-module.exports = { protect };
+// Middleware to restrict access to administrator accounts only
+const admin = (req, res, next) => {
+  if (req.user && req.user.role === 'admin') {
+    next();
+  } else {
+    res.status(403).json({
+      success: false,
+      message: 'Access denied: Administrator privileges required',
+    });
+  }
+};
+
+module.exports = { protect, admin };
